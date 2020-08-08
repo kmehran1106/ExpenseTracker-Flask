@@ -1,36 +1,34 @@
 import os
-
-# uncomment the line below for postgres database url from environment variable
-# postgres_local_base = os.environ['DATABASE_URL']
+from environs import Env
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+env = Env()
+env.read_env(".env", recurse=False)
+
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'SacredKey')
-    DEBUG = False
+    DEBUG = env.bool("DEBUG", default=False)
+    SECRET_KEY = env.str("SECRET_KEY", default="SecretKey")
 
 
 class DevelopmentConfig(Config):
-    # uncomment the line below to use postgres
-    # SQLALCHEMY_DATABASE_URI = postgres_local_base
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'flask_boilerplate_main.db')
+    DATABASE_URL = env.str("DATABASE_URL", default="postgres://root:3210@127.0.0.1:5432/expense_tracker")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class TestingConfig(Config):
     DEBUG = True
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'flask_boilerplate_test.db')
+    DATABASE_URL = env.str("DATABASE_URL", default="postgres://root:3210@127.0.0.1:5432/expense_tracker")
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class ProductionConfig(Config):
     DEBUG = False
-    # uncomment the line below to use postgres
-    # SQLALCHEMY_DATABASE_URI = postgres_local_base
+    DATABASE_URL = env.str("DATABASE_URL")
 
 
 config_by_name = dict(
